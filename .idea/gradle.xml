@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="testRunner" value="GRADLE" />
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/audioplayer" />
+            <option value="$PROJECT_DIR$/auth" />
+            <option value="$PROJECT_DIR$/ble" />
+            <option value="$PROJECT_DIR$/buildSrc" />
+            <option value="$PROJECT_DIR$/camera" />
+            <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/common-java" />
+            <option value="$PROJECT_DIR$/data-figure" />
+            <option value="$PROJECT_DIR$/db" />
+            <option value="$PROJECT_DIR$/device" />
+            <option value="$PROJECT_DIR$/help" />
+            <option value="$PROJECT_DIR$/logger" />
+            <option value="$PROJECT_DIR$/net" />
+            <option value="$PROJECT_DIR$/startup" />
+            <option value="$PROJECT_DIR$/upgrade" />
+            <option value="$PROJECT_DIR$/videoplayer" />
+            <option value="$PROJECT_DIR$/voice" />
+            <option value="$PROJECT_DIR$/xcrash" />
+          </set>
+        </option>
+        <option name="resolveModulePerSourceSet" value="false" />
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

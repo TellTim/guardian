@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="1.7">
+      <module name="Guardian.app" target="11" />
+      <module name="Guardian.audioplayer" target="11" />
+      <module name="Guardian.auth" target="11" />
+      <module name="Guardian.ble" target="11" />
+      <module name="Guardian.buildSrc" target="11" />
+      <module name="Guardian.camera" target="11" />
+      <module name="Guardian.common" target="11" />
+      <module name="Guardian.data-figure" target="11" />
+      <module name="Guardian.db" target="11" />
+      <module name="Guardian.device" target="11" />
+      <module name="Guardian.help" target="11" />
+      <module name="Guardian.logger" target="11" />
+      <module name="Guardian.net" target="11" />
+      <module name="Guardian.startup" target="11" />
+      <module name="Guardian.upgrade" target="11" />
+      <module name="Guardian.videoplayer" target="11" />
+      <module name="Guardian.voice" target="11" />
+      <module name="Guardian.xcrash" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
