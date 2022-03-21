@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author Tim.WJ
  */
-public class Utils {
+public final class Utils {
 
     private static final Comparator<AppBootUpTask> TASK_COMPARATOR = new Comparator<AppBootUpTask>() {
         @Override

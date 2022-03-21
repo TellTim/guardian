@@ -5,6 +5,9 @@ import com.telltim.startup.AppBootUpTask;
 
 import java.util.Collections;
 import java.util.List;
+/**
+ * @author Tim.WJ
+ */
 public class AppInitTask extends AppBootUpTask {
 
     @Override

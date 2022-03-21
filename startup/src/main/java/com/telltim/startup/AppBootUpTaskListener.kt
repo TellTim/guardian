@@ -2,7 +2,6 @@ package com.telltim.startup
 
 import android.os.Process
 import android.os.Trace
-import cn.telltim.common.ThreadManager
 import com.orhanobut.logger.Logger
 
 /**
@@ -19,6 +18,8 @@ import com.orhanobut.logger.Logger
  * @Version:        1.0
  */
 class AppBootUpTaskListener (private val tag: String, private val isLog: Boolean) : TaskListener {
+    val DEFAULT_PRIORITY = (Process.THREAD_PRIORITY_BACKGROUND
+            + Process.THREAD_PRIORITY_MORE_FAVORABLE)
     override fun onWaitRunning(task: AppBootUpTask?) {}
     override fun onStart(task: AppBootUpTask?) {
         if (isLog) {
@@ -32,7 +33,7 @@ class AppBootUpTaskListener (private val tag: String, private val isLog: Boolean
 
     override fun onFinish(task: AppBootUpTask?, dw: Long, df: Long) {
         if (task!!.isWaitOnMainThread) {
-            Process.setThreadPriority(ThreadManager.DEFAULT_PRIORITY)
+            Process.setThreadPriority(DEFAULT_PRIORITY)
         }
         Trace.endSection()
         if (isLog) {

@@ -30,9 +30,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            isDebuggable = false
         }
         getByName("debug") {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
+            isDebuggable = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -63,6 +65,7 @@ android {
 }
 
 dependencies {
+    implementation(fileTree(mapOf("include" to listOf("*.jar"), "dir" to "libs")))
     implementation(KtDeps.ktx)
     implementation(Deps.multidex)
     implementation(Deps.ComposeDeps.composeUI)
@@ -75,6 +78,7 @@ dependencies {
     implementation(project(mapOf("path" to ":startup")))
     implementation(project(mapOf("path" to ":xcrash")))
     implementation(project(mapOf("path" to ":logger")))
+    implementation(project(mapOf("path" to ":thread-pool")))
     testImplementation(Deps.TestDeps.junit)
     androidTestImplementation(Deps.TestDeps.extJunit)
     androidTestImplementation(Deps.TestDeps.espresso)

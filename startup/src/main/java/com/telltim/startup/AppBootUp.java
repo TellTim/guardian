@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author Tim.WJ
  */
-public class AppBootUp {
+public final class AppBootUp {
 
     public static final String TAG = "AppStartup";
 
