@@ -23,3 +23,4 @@ include(":app",":ble",":auth",
     ":startup",":xcrash",":logger",
     ":thread-pool"
 )
+include(":xthread-pool")

@@ -1,6 +1,5 @@
 package cn.telltim.guardian.app
 
-import android.content.Context
 import android.util.Log
 import androidx.multidex.MultiDexApplication
 import cn.telltim.common.ProcessUtil
@@ -151,7 +150,7 @@ class GuardianApp : MultiDexApplication() {
             .build()
         Logger.addLogAdapter(object : AndroidLogAdapter(formatStrategy) {
             override fun isLoggable(priority: Int, tag: String?): Boolean {
-                return if (priority == Log.DEBUG) {
+                return if (priority > Log.DEBUG) {
                     true
                 } else {
                     BuildConfig.DEBUG

@@ -25,10 +25,10 @@ class LogCallback:ThreadCallback {
     }
 
     override fun onCompleted(name: String) {
-        Logger.t(_tag).i("onCompleted :$name")
+        Logger.t(_tag).d("onCompleted :$name")
     }
 
     override fun onStart(name: String) {
-        Logger.t(_tag).i("onStart :$name")
+        Logger.t(_tag).d("onStart :$name")
     }
 }

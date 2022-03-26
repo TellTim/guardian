@@ -37,7 +37,7 @@ class AppBootUpTaskListener (private val tag: String, private val isLog: Boolean
         }
         Trace.endSection()
         if (isLog) {
-            Logger.t(task.taskName).i("任务结束 :" + task.taskName + " wait " + dw + " cost " + df)
+            Logger.t(task.taskName).d("任务结束 :" + task.taskName + " wait " + dw + " cost " + df)
         }
     }
 }
