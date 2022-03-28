@@ -78,7 +78,6 @@ dependencies {
     implementation(project(mapOf("path" to ":startup")))
     implementation(project(mapOf("path" to ":xcrash")))
     implementation(project(mapOf("path" to ":logger")))
-    implementation(project(mapOf("path" to ":thread-pool")))
     testImplementation(Deps.TestDeps.junit)
     androidTestImplementation(Deps.TestDeps.extJunit)
     androidTestImplementation(Deps.TestDeps.espresso)

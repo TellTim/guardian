@@ -1,12 +1,12 @@
 package cn.telltim.guardian.app
 
 import android.util.Log
+import androidx.multidex.BuildConfig
 import androidx.multidex.MultiDexApplication
 import cn.telltim.common.ProcessUtil
 import cn.telltim.guardian.BuildConfig
 import cn.telltim.guardian.app.init.AppInitTask
 import cn.telltim.guardian.global.AppConst
-import cn.ycbjie.ycthreadpoollib.ThreadManager
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.PrettyFormatStrategy
@@ -85,7 +85,7 @@ class GuardianApp : MultiDexApplication() {
         // Initialize xCrash.
         XCrash.init(
             this, InitParameters()
-                .setAppVersion("1.2.3-beta456-patch789")
+                .setAppVersion(BuildConfig.VERSION_NAME)
                 .setJavaRethrow(true)
                 .setJavaLogCountMax(10)
                 .setJavaDumpAllThreadsWhiteList(arrayOf("^main$", "^Binder:.*", ".*Finalizer.*"))

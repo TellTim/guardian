@@ -20,7 +20,6 @@ include(":app",":ble",":auth",
     ":common",":audioplayer",":videoplayer",
     ":upgrade",":data-figure",":help",
     ":voice",":camera",":common-java",
-    ":startup",":xcrash",":logger",
-    ":thread-pool"
+    ":startup",":xcrash",":logger"
 )
-include(":xthread-pool")
+include(":xthread-task")
