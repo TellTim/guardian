@@ -7,7 +7,7 @@
 // <author> <time> <version> <desc>
 // 作者姓名 修改时间 版本号 描述
 //
-package com.smartwasp.xtask.factory
+package com.telltim.xtask.factory
 
 import android.os.Process
 import java.util.concurrent.ThreadFactory

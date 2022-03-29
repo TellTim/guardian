@@ -117,7 +117,7 @@ class XThreadPoolManager {
      *          一个int类型的数据，这样创建出来的LinkedBlockingQueue是有大小的，也可以不传，不传的话，
      *          LinkedBlockingQueue的大小就为Integer.MAX_VALUE
      * */
-    private fun getThreadPool(tag: String,priority:Int = Thread.NORM_PRIORITY):
+    private fun getThreadPool(tag: String):
             ThreadPoolExecutor {
         var threadPoolExecutor = threadPoolMap[tag]
         if (threadPoolExecutor == null) {
@@ -127,7 +127,7 @@ class XThreadPoolManager {
                 KEEP_ALIVE_TIME,
                 TimeUnit.SECONDS,
                 ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
-                XThreadFactory( tag,priority),
+                XThreadFactory( tag),
                 RejectedExecutionHandler { _, _threadPoolExecutor ->
                     Logger.t("XThreadPoolManager").w(
                         "$_threadPoolExecutor  " +

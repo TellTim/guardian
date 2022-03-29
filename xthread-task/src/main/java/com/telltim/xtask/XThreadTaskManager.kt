@@ -37,14 +37,42 @@
  *     当一个线程1被另外一个线程2唤醒时，1线程进入锁池状态，去争夺对象锁。
  *     锁池是在同步的环境下才有的概念，一个对象对应一个锁池
  */
-package com.smartwasp.xtask
+
+ /*　
+ *  几个重要的参数
+ *   corePoolSize  线程池中核心线程的数量 除非allowCoreThreadTimeOut被设置为true，否则它闲着也不会死
+ *   maximumPoolSize  线程池中最大线程数量，等待队列的任务塞满了之后，才会触发开启非核心线程，
+ *   直到总线程数达到 maximumPoolSize
+ *   keepAliveTime 非核心线程的超时时长，
+ *   当系统中非核心线程闲置时间超过keepAliveTime之后，则会被回收
+ *   如果ThreadPoolExecutor的allowCoreThreadTimeOut属性设置为true，则该参数也作用于核心线程的超时时长
+ *   unit 第三个参数的单位，有纳秒、微秒、毫秒、秒、分、时、天等
+ *   queueSize 等待队列的长度 一般128 (参考 AsyncTask)
+ *          workQueue 线程池中的任务队列，该队列主要用来存储已经被提交但是尚未执行的任务。
+ *   存储在这里的任务是由ThreadPoolExecutor的execute方法提交来的。
+ *   threadFactory  为线程池提供创建新线程的功能，这个我们一般使用默认即可
+ *
+ *   1.ArrayBlockingQueue：这个表示一个规定了大小的BlockingQueue，ArrayBlockingQueue的构造函数接受一个int类型的数据，
+ *              该数据表示BlockingQueue的大小，存储在ArrayBlockingQueue中的元素按照FIFO（先进先出）的方式来进行存取。
+ *   2.LinkedBlockingQueue：这个表示一个大小不确定的BlockingQueue，在LinkedBlockingQueue的构造方法中可以传
+ *          一个int类型的数据，这样创建出来的LinkedBlockingQueue是有大小的，也可以不传，不传的话，
+ *          LinkedBlockingQueue的大小就为Integer.MAX_VALUE
+ * 形象的比喻如下:
+ * 比如去火车站买票, 有10个售票窗口, 但只有5个窗口对外开放. 那么对外开放的5个窗口称为核心线程数,
+ * 而最大线程数是10个窗口.
+ * 如果5个窗口都被占用, 那么后来的人就必须在后面排队, 但后来售票厅人越来越多, 已经人满为患, 就类似于线程队列已满.
+ * 这时候火车站站长下令, 把剩下的5个窗口也打开, 也就是目前已经有10个窗口同时运行. 后来又来了一批人,
+ * 10个窗口也处理不过来了, 而且售票厅人已经满了, 这时候站长就下令封锁入口,不允许其他人再进来, 这就是线程异常处理策略.
+ * 而线程存活时间指的是, 允许售票员休息的最长时间, 以此限制售票员偷懒的行为.
+ */
+package com.telltim.xtask
 
 import android.os.Handler
 import android.os.Looper
 import android.os.Process
 import androidx.annotation.NonNull
 import com.orhanobut.logger.Logger
-import com.smartwasp.xtask.factory.XThreadFactory
+import com.telltim.xtask.factory.XThreadFactory
 import java.util.concurrent.*
 
 
@@ -56,10 +84,6 @@ import java.util.concurrent.*
  * @Description:自定义线程池管理类
  * 获取io型，cpu型，单核的线程池，和自定义的线程池
  *     支持打印线程池的状态，支持schedule，支持future。支持关闭
- * CPU 密集型程序的最佳线程数 最佳线程数 = CPU 核数（逻辑）+ 1（经验值）
- * I/O 密集型程序的最佳线程数就是 最佳线程数 = ((线程等待时间+线程CPU时间)/线程CPU时间)* CPU数目
- *                                    = CPU核心数 * (1+CPU利用率)
- *                                    = CPU核心数 * (1 + (线程等待时间/CPU耗时))
  * Executors 返回线程池对象的弊端如下：
  * FixedThreadPool 和 SingleThreadExecutor ：
  *     允许请求的队列长度为 Integer.MAX_VALUE,可能堆积大量的请求，从而导致 OOM。
@@ -91,29 +115,37 @@ class XThreadTaskManager {
     private val CPU_COUNT = Runtime.getRuntime().availableProcessors()
 
     /**
-     * 核心线程数为手机CPU数量+1
-     * */
-    private val CORE_POOL_SIZE = CPU_COUNT + 1
-
-    /**
-     * 允许线程空闲时间（单位：默认为秒）
-     */
-    private val KEEP_ALIVE_TIME = 60L
-
-    /**
-     * 最大线程数为手机CPU数量×2+1
-     * */
-    private val MAXIMUM_POOL_SIZE = CPU_COUNT * 2 + 1
-
-    /**
      * 缓冲队列数
      */
     private val QUEUE_CAPACITY = 128
 
-    private val mDiskIO: Executor? by lazy { null }
+    /**
+     * 数据库的线程池
+     */
+    private var mDbIOExecutor: ThreadPoolExecutor?
+        get() = null
 
-    private val mNetworkIO: Executor? by lazy { null }
+    /**
+     * 网络的线程池
+     */
+    private val mNetworkIOExecutor: ThreadPoolExecutor?
+        get() = null
 
+    /**
+     * 文件io的线程池
+     */
+    private val mFileThreadPoolExecutor:ThreadPoolExecutor?
+        get() = null
+
+    /**
+     * CPU密集型的线程池
+     */
+    private val cpuThreadPoolExecutor : ThreadPoolExecutor?
+        get() = null
+
+    /**
+     * UI主线程
+     */
     private val mMainThread: Executor? by lazy { MainThreadExecutor() }
 
     /**
@@ -121,7 +153,14 @@ class XThreadTaskManager {
      */
     private var threadPoolMap = hashMapOf<String, ThreadPoolExecutor>()
 
+    /**
+     * CPU 密集型程序的最佳线程数 最佳线程数 = CPU 核数（逻辑）+ 1（经验值）
+     * I/O 密集型程序的最佳线程数就是 最佳线程数 = ((线程等待时间+线程CPU时间)/线程CPU时间)* CPU数目
+     *                                    = CPU核心数 * (1+CPU利用率)
+     *                                    = CPU核心数 * (1 + (线程等待时间/CPU耗时))
+     */
     init {
+
         // 打印的线程池
         addThreadPool(
             DUMP_TASK, Process.THREAD_PRIORITY_BACKGROUND,
@@ -131,29 +170,26 @@ class XThreadTaskManager {
                 ThreadPoolExecutor.DiscardOldestPolicy()
             )
         )
+        // 假定数据库的CPU的利用率是1/3,则CPU_CORE_SIZE = CPU_COUNT*(1 + 1/0.3)
+        val dbCpuCoreSize= 4*CPU_COUNT
+
+        mDbIOExecutor = ThreadPoolExecutor(
+            dbCpuCoreSize,
+            CPU_COUNT+dbCpuCoreSize,
+            0L,
+            TimeUnit.MILLISECONDS,
+            ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
+            RejectedExecutionHandler { _, _threadPoolExecutor ->
+                Logger.t("XThreadPoolManager").w(
+                    "$_threadPoolExecutor  " +
+                            "RejectedExecutionHandler"
+                )
+            }
+        )
+
     }
 
-    /**
-     *   @param tag 针对每个TAG 获取对应的线程池
-     *   @param corePoolSize  线程池中核心线程的数量 除非allowCoreThreadTimeOut被设置为true，否则它闲着也不会死
-     *   @param maximumPoolSize  线程池中最大线程数量，等待队列的任务塞满了之后，才会触发开启非核心线程，
-     *          直到总线程数达到 maximumPoolSize
-     *   @param keepAliveTime 非核心线程的超时时长，
-     *          当系统中非核心线程闲置时间超过keepAliveTime之后，则会被回收
-     *          如果ThreadPoolExecutor的allowCoreThreadTimeOut属性设置为true，则该参数也作用于核心线程的超时时长
-     *   @param unit 第三个参数的单位，有纳秒、微秒、毫秒、秒、分、时、天等
-     *   @param queueSize 等待队列的长度 一般128 (参考 AsyncTask)
-     *          workQueue 线程池中的任务队列，该队列主要用来存储已经被提交但是尚未执行的任务。
-     *   存储在这里的任务是由ThreadPoolExecutor的execute方法提交来的。
-     *   threadFactory  为线程池提供创建新线程的功能，这个我们一般使用默认即可
-     *
-     *   1.ArrayBlockingQueue：这个表示一个规定了大小的BlockingQueue，ArrayBlockingQueue的构造函数接受一个int类型的数据，
-     *              该数据表示BlockingQueue的大小，存储在ArrayBlockingQueue中的元素按照FIFO（先进先出）的方式来进行存取。
-     *   2.LinkedBlockingQueue：这个表示一个大小不确定的BlockingQueue，在LinkedBlockingQueue的构造方法中可以传
-     *          一个int类型的数据，这样创建出来的LinkedBlockingQueue是有大小的，也可以不传，不传的话，
-     *          LinkedBlockingQueue的大小就为Integer.MAX_VALUE
-     * */
-    private fun getThreadPool(tag: String, priority: Int = Process.THREAD_PRIORITY_DEFAULT):
+    /*private fun getThreadPool(tag: String, priority: Int = Process.THREAD_PRIORITY_DEFAULT):
             ThreadPoolExecutor {
         var threadPoolExecutor = threadPoolMap[tag]
         if (threadPoolExecutor == null) {
@@ -175,7 +211,7 @@ class XThreadTaskManager {
             threadPoolMap[tag] = threadPoolExecutor
         }
         return threadPoolExecutor
-    }
+    }*/
 
     private fun addThreadPool(
         taskName: String,
@@ -199,7 +235,7 @@ class XThreadTaskManager {
      *  @param runnable 对应的 runnable 任务
      * */
     fun addTask(tag: TaskType, runnable: Runnable) {
-        getThreadPool(tag.type).execute(runnable)
+        //getThreadPool(tag.type).execute(runnable)
     }
 
     /**
@@ -208,7 +244,7 @@ class XThreadTaskManager {
      *  @param runnable 对应的 runnable 任务
      * */
     fun addCustomTask(tag: String, runnable: Runnable) {
-        getThreadPool(tag).execute(runnable)
+        //getThreadPool(tag).execute(runnable)
     }
 
     /**
@@ -224,14 +260,14 @@ class XThreadTaskManager {
      *  @param runnable 对应的 runnable 任务
      * */
     fun addCustomScheduleTask(tag: String, runnable: Runnable) {
-        getThreadPool(tag).execute(runnable)
+        //getThreadPool(tag).execute(runnable)
     }
 
     /**
      * 关闭自定义线程池
      */
     fun removeCustomScheduleTask(tag: String, runnable: Runnable) {
-    // todo
+        // todo
     }
 
 

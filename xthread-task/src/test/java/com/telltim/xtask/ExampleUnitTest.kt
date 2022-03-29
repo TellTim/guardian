@@ -1,4 +1,4 @@
-package com.smartwasp.xtask
+package com.telltim.xtask
 
 import org.junit.Test
 
