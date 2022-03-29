@@ -128,19 +128,19 @@ class XThreadTaskManager {
     /**
      * 网络的线程池
      */
-    private val mNetworkIOExecutor: ThreadPoolExecutor?
+    private var mNetworkIOExecutor: ThreadPoolExecutor?
         get() = null
 
     /**
      * 文件io的线程池
      */
-    private val mFileThreadPoolExecutor:ThreadPoolExecutor?
+    private var mFileThreadPoolExecutor:ThreadPoolExecutor?
         get() = null
 
     /**
      * CPU密集型的线程池
      */
-    private val cpuThreadPoolExecutor : ThreadPoolExecutor?
+    private var cpuThreadPoolExecutor : ThreadPoolExecutor?
         get() = null
 
     /**
@@ -154,10 +154,9 @@ class XThreadTaskManager {
     private var threadPoolMap = hashMapOf<String, ThreadPoolExecutor>()
 
     /**
-     * CPU 密集型程序的最佳线程数 最佳线程数 = CPU 核数（逻辑）+ 1（经验值）
-     * I/O 密集型程序的最佳线程数就是 最佳线程数 = ((线程等待时间+线程CPU时间)/线程CPU时间)* CPU数目
-     *                                    = CPU核心数 * (1+CPU利用率)
-     *                                    = CPU核心数 * (1 + (线程等待时间/CPU耗时))
+     * CPU 密集型程序的最佳线程数 最佳线程数 = CPU 核数(逻辑)+ 1(经验值),可以视为线程等待时间近乎0
+     * I/O 密集型程序的最佳线程数就是 最佳线程数 = ((线程等待时间 + 线程CPU时间)/线程CPU时间)* CPU数目
+     *                                    = CPU核心数 * (1 + (线程等待时间/线程CPU时间))
      */
     init {
 
@@ -170,10 +169,10 @@ class XThreadTaskManager {
                 ThreadPoolExecutor.DiscardOldestPolicy()
             )
         )
-        // 假定数据库的CPU的利用率是1/3,则CPU_CORE_SIZE = CPU_COUNT*(1 + 1/0.3)
-        val dbCpuCoreSize= 4*CPU_COUNT
-
-        mDbIOExecutor = ThreadPoolExecutor(
+        // 假定数据库的CPU的利用率是1/2,则CPU_CORE_SIZE = CPU_COUNT*(1 + 1/0.5)
+        val dbCpuCoreSize= 3*CPU_COUNT
+        mDbIOExecutor = addThreadPool(TaskType.TYPE_DB.type, Process.THREAD_PRIORITY_DEFAULT,
+            ThreadPoolExecutor(
             dbCpuCoreSize,
             CPU_COUNT+dbCpuCoreSize,
             0L,
@@ -185,19 +184,15 @@ class XThreadTaskManager {
                             "RejectedExecutionHandler"
                 )
             }
-        )
-
-    }
-
-    /*private fun getThreadPool(tag: String, priority: Int = Process.THREAD_PRIORITY_DEFAULT):
-            ThreadPoolExecutor {
-        var threadPoolExecutor = threadPoolMap[tag]
-        if (threadPoolExecutor == null) {
-            threadPoolExecutor = ThreadPoolExecutor(
-                CORE_POOL_SIZE,
-                MAXIMUM_POOL_SIZE,
-                KEEP_ALIVE_TIME,
-                TimeUnit.SECONDS,
+        ))
+        // 假定数据库的CPU的利用率是1/3,则CPU_CORE_SIZE = CPU_COUNT*(1 + 1/0.33)
+        val fileCpuCoreSize= 4*CPU_COUNT
+        mFileThreadPoolExecutor = addThreadPool(TaskType.TYPE_DB.type, Process.THREAD_PRIORITY_DEFAULT,
+            ThreadPoolExecutor(
+                fileCpuCoreSize,
+                CPU_COUNT+fileCpuCoreSize,
+                0L,
+                TimeUnit.MILLISECONDS,
                 ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
                 RejectedExecutionHandler { _, _threadPoolExecutor ->
                     Logger.t("XThreadPoolManager").w(
@@ -205,13 +200,39 @@ class XThreadTaskManager {
                                 "RejectedExecutionHandler"
                     )
                 }
-            )
-            //允许核心线程闲置超时时被回收
-            threadPoolExecutor.allowCoreThreadTimeOut(true)
-            threadPoolMap[tag] = threadPoolExecutor
-        }
-        return threadPoolExecutor
-    }*/
+            ))
+        // 假定数据库的CPU的利用率是1,则CPU_CORE_SIZE = CPU_COUNT*(1 + 1/1)
+        val netCpuCoreSize= 2*CPU_COUNT
+        mNetworkIOExecutor = addThreadPool(TaskType.TYPE_DB.type, Process.THREAD_PRIORITY_DEFAULT,
+            ThreadPoolExecutor(
+                netCpuCoreSize,
+                CPU_COUNT+netCpuCoreSize,
+                0L,
+                TimeUnit.MILLISECONDS,
+                ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
+                RejectedExecutionHandler { _, _threadPoolExecutor ->
+                    Logger.t("XThreadPoolManager").w(
+                        "$_threadPoolExecutor  " +
+                                "RejectedExecutionHandler"
+                    )
+                }
+            ))
+        val cpuCoreSize = CPU_COUNT + 1
+        cpuThreadPoolExecutor = addThreadPool(TaskType.TYPE_DB.type, Process.THREAD_PRIORITY_DEFAULT,
+            ThreadPoolExecutor(
+                cpuCoreSize,
+                CPU_COUNT+cpuCoreSize,
+                0L,
+                TimeUnit.MILLISECONDS,
+                ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
+                RejectedExecutionHandler { _, _threadPoolExecutor ->
+                    Logger.t("XThreadPoolManager").w(
+                        "$_threadPoolExecutor  " +
+                                "RejectedExecutionHandler"
+                    )
+                }
+            ))
+    }
 
     private fun addThreadPool(
         taskName: String,
