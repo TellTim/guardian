@@ -38,33 +38,33 @@
  *     锁池是在同步的环境下才有的概念，一个对象对应一个锁池
  */
 
- /*　
- *  几个重要的参数
- *   corePoolSize  线程池中核心线程的数量 除非allowCoreThreadTimeOut被设置为true，否则它闲着也不会死
- *   maximumPoolSize  线程池中最大线程数量，等待队列的任务塞满了之后，才会触发开启非核心线程，
- *   直到总线程数达到 maximumPoolSize
- *   keepAliveTime 非核心线程的超时时长，
- *   当系统中非核心线程闲置时间超过keepAliveTime之后，则会被回收
- *   如果ThreadPoolExecutor的allowCoreThreadTimeOut属性设置为true，则该参数也作用于核心线程的超时时长
- *   unit 第三个参数的单位，有纳秒、微秒、毫秒、秒、分、时、天等
- *   queueSize 等待队列的长度 一般128 (参考 AsyncTask)
- *          workQueue 线程池中的任务队列，该队列主要用来存储已经被提交但是尚未执行的任务。
- *   存储在这里的任务是由ThreadPoolExecutor的execute方法提交来的。
- *   threadFactory  为线程池提供创建新线程的功能，这个我们一般使用默认即可
- *
- *   1.ArrayBlockingQueue：这个表示一个规定了大小的BlockingQueue，ArrayBlockingQueue的构造函数接受一个int类型的数据，
- *              该数据表示BlockingQueue的大小，存储在ArrayBlockingQueue中的元素按照FIFO（先进先出）的方式来进行存取。
- *   2.LinkedBlockingQueue：这个表示一个大小不确定的BlockingQueue，在LinkedBlockingQueue的构造方法中可以传
- *          一个int类型的数据，这样创建出来的LinkedBlockingQueue是有大小的，也可以不传，不传的话，
- *          LinkedBlockingQueue的大小就为Integer.MAX_VALUE
- * 形象的比喻如下:
- * 比如去火车站买票, 有10个售票窗口, 但只有5个窗口对外开放. 那么对外开放的5个窗口称为核心线程数,
- * 而最大线程数是10个窗口.
- * 如果5个窗口都被占用, 那么后来的人就必须在后面排队, 但后来售票厅人越来越多, 已经人满为患, 就类似于线程队列已满.
- * 这时候火车站站长下令, 把剩下的5个窗口也打开, 也就是目前已经有10个窗口同时运行. 后来又来了一批人,
- * 10个窗口也处理不过来了, 而且售票厅人已经满了, 这时候站长就下令封锁入口,不允许其他人再进来, 这就是线程异常处理策略.
- * 而线程存活时间指的是, 允许售票员休息的最长时间, 以此限制售票员偷懒的行为.
- */
+/*　
+*  几个重要的参数
+*   corePoolSize  线程池中核心线程的数量 除非allowCoreThreadTimeOut被设置为true，否则它闲着也不会死
+*   maximumPoolSize  线程池中最大线程数量，等待队列的任务塞满了之后，才会触发开启非核心线程，
+*   直到总线程数达到 maximumPoolSize
+*   keepAliveTime 非核心线程的超时时长，
+*   当系统中非核心线程闲置时间超过keepAliveTime之后，则会被回收
+*   如果ThreadPoolExecutor的allowCoreThreadTimeOut属性设置为true，则该参数也作用于核心线程的超时时长
+*   unit 第三个参数的单位，有纳秒、微秒、毫秒、秒、分、时、天等
+*   queueSize 等待队列的长度 一般128 (参考 AsyncTask)
+*          workQueue 线程池中的任务队列，该队列主要用来存储已经被提交但是尚未执行的任务。
+*   存储在这里的任务是由ThreadPoolExecutor的execute方法提交来的。
+*   threadFactory  为线程池提供创建新线程的功能，这个我们一般使用默认即可
+*
+*   1.ArrayBlockingQueue：这个表示一个规定了大小的BlockingQueue，ArrayBlockingQueue的构造函数接受一个int类型的数据，
+*              该数据表示BlockingQueue的大小，存储在ArrayBlockingQueue中的元素按照FIFO（先进先出）的方式来进行存取。
+*   2.LinkedBlockingQueue：这个表示一个大小不确定的BlockingQueue，在LinkedBlockingQueue的构造方法中可以传
+*          一个int类型的数据，这样创建出来的LinkedBlockingQueue是有大小的，也可以不传，不传的话，
+*          LinkedBlockingQueue的大小就为Integer.MAX_VALUE
+* 形象的比喻如下:
+* 比如去火车站买票, 有10个售票窗口, 但只有5个窗口对外开放. 那么对外开放的5个窗口称为核心线程数,
+* 而最大线程数是10个窗口.
+* 如果5个窗口都被占用, 那么后来的人就必须在后面排队, 但后来售票厅人越来越多, 已经人满为患, 就类似于线程队列已满.
+* 这时候火车站站长下令, 把剩下的5个窗口也打开, 也就是目前已经有10个窗口同时运行. 后来又来了一批人,
+* 10个窗口也处理不过来了, 而且售票厅人已经满了, 这时候站长就下令封锁入口,不允许其他人再进来, 这就是线程异常处理策略.
+* 而线程存活时间指的是, 允许售票员休息的最长时间, 以此限制售票员偷懒的行为.
+*/
 package com.telltim.xtask
 
 import android.os.Handler
@@ -117,6 +117,26 @@ class XThreadTaskManager {
     private val CPU_COUNT = Runtime.getRuntime().availableProcessors()
 
     /**
+     * 假定数据库的CPU的利用率是1/2,则CPU_CORE_SIZE = CPU_COUNT*(1 + 1/0.5)
+     */
+    private val DB_THREAD_POOL_SIZE = 3 * CPU_COUNT
+
+    /**
+     * 假定数据库的CPU的利用率是1,则CPU_CORE_SIZE = CPU_COUNT*(1 + 1/1)
+     */
+    private val NET_THREAD_POOL_SIZE = 2 * CPU_COUNT
+
+    /**
+     * 假定数据库的CPU的利用率是1/3,则CPU_CORE_SIZE = CPU_COUNT*(1 + 1/0.33)
+     */
+    private val FILE_THREAD_POOL_SIZE = 4 * CPU_COUNT
+
+    /**
+     * CPU密集型的核心线程池大小
+     */
+    private val CPU_THREAD_POOL_SIZE = CPU_COUNT + 1
+
+    /**
      * 缓冲队列数
      */
     private val QUEUE_CAPACITY = 128
@@ -136,13 +156,13 @@ class XThreadTaskManager {
     /**
      * 文件io的线程池
      */
-    private var mFileThreadPoolExecutor:ThreadPoolExecutor?
+    private var mFileThreadPoolExecutor: ThreadPoolExecutor?
         get() = null
 
     /**
      * CPU密集型的线程池
      */
-    private var cpuThreadPoolExecutor : ThreadPoolExecutor?
+    private var cpuThreadPoolExecutor: ThreadPoolExecutor?
         get() = null
 
     /**
@@ -171,150 +191,133 @@ class XThreadTaskManager {
                 ThreadPoolExecutor.DiscardOldestPolicy()
             )
         )
-        // 假定数据库的CPU的利用率是1/2,则CPU_CORE_SIZE = CPU_COUNT*(1 + 1/0.5)
-        val dbCpuCoreSize= 3*CPU_COUNT
-        mDbIOExecutor = generateThreadPoolExecutor(dbCpuCoreSize)(TaskType.TYPE_DB.type, Process.THREAD_PRIORITY_DEFAULT,
-            ThreadPoolExecutor(
-            dbCpuCoreSize,
-            CPU_COUNT+dbCpuCoreSize,
-            0L,
-            TimeUnit.MILLISECONDS,
-            ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
-            RejectedExecutionHandler { _, _threadPoolExecutor ->
-                Logger.t("XThreadPoolManager").w(
-                    "$_threadPoolExecutor  " +
-                            "RejectedExecutionHandler"
-                )
-            }
-        ))
-        // 假定数据库的CPU的利用率是1/3,则CPU_CORE_SIZE = CPU_COUNT*(1 + 1/0.33)
-        val fileCpuCoreSize= 4*CPU_COUNT
-        mFileThreadPoolExecutor = generateThreadPoolExecutor(fileCpuCoreSize)(TaskType.TYPE_DB.type, Process.THREAD_PRIORITY_DEFAULT,
-            ThreadPoolExecutor(
-                fileCpuCoreSize,
-                CPU_COUNT+fileCpuCoreSize,
-                0L,
-                TimeUnit.MILLISECONDS,
-                ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
-                RejectedExecutionHandler { _, _threadPoolExecutor ->
-                    Logger.t("XThreadPoolManager").w(
-                        "$_threadPoolExecutor  " +
-                                "RejectedExecutionHandler"
-                    )
-                }
-            ))
-        // 假定数据库的CPU的利用率是1,则CPU_CORE_SIZE = CPU_COUNT*(1 + 1/1)
-        val netCpuCoreSize= 2*CPU_COUNT
-        generateThreadPoolExecutor(netCpuCoreSize)
-        val cpuCoreSize = CPU_COUNT + 1
-        cpuThreadPoolExecutor = generateThreadPoolExecutor(cpuCoreSize)(TaskType.TYPE_DB.type, Process.THREAD_PRIORITY_DEFAULT,
-            ThreadPoolExecutor(
-                cpuCoreSize,
-                CPU_COUNT+cpuCoreSize,
-                0L,
-                TimeUnit.MILLISECONDS,
-                ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
-                RejectedExecutionHandler { _, _threadPoolExecutor ->
-                    Logger.t("XThreadPoolManager").w(
-                        "$_threadPoolExecutor  " +
-                                "RejectedExecutionHandler"
-                    )
-                }
-            ))
+        mDbIOExecutor = generateThreadPoolExecutor(TaskType.TYPE_DB)
+        mFileThreadPoolExecutor = generateThreadPoolExecutor(TaskType.TYPE_FILE)
+        mNetworkIOExecutor = generateThreadPoolExecutor(TaskType.TYPE_NETWORK)
+        cpuThreadPoolExecutor = generateThreadPoolExecutor(TaskType.TYPE_CPU)
     }
 
-    private fun generateThreadPoolExecutor(taskType:TaskType):ThreadPoolExecutor {
-
-        when(taskType){
-            TaskType.TYPE_CPU->{
-                val dbCpuCoreSize= 3*CPU_COUNT
-                return addThreadPool(TaskType.TYPE_DB.type, Process.THREAD_PRIORITY_DEFAULT,
+    private fun generateThreadPoolExecutor(taskType: TaskType): ThreadPoolExecutor {
+        when (taskType) {
+            TaskType.TYPE_CPU -> {
+                return addThreadPool(taskType.type, Process.THREAD_PRIORITY_DEFAULT,
                     ThreadPoolExecutor(
-                        dbCpuCoreSize,
-                        CPU_COUNT+dbCpuCoreSize,
+                        CPU_THREAD_POOL_SIZE,
+                        CPU_COUNT + CPU_THREAD_POOL_SIZE,
                         0L,
                         TimeUnit.MILLISECONDS,
                         ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
                         RejectedExecutionHandler { _, _threadPoolExecutor ->
-                            Logger.t("XThreadPoolManager").w(
-                                "$_threadPoolExecutor  " +
+                            Logger.t(TAG).w(
+                                "[${taskType.type}]:$_threadPoolExecutor  " +
                                         "RejectedExecutionHandler"
                             )
                         }
                     ))
             }
-            TaskType.TYPE_CPU->{
-
+            TaskType.TYPE_DB -> {
+                return addThreadPool(taskType.type, Process.THREAD_PRIORITY_DEFAULT,
+                    ThreadPoolExecutor(
+                        DB_THREAD_POOL_SIZE,
+                        CPU_COUNT + DB_THREAD_POOL_SIZE,
+                        0L,
+                        TimeUnit.MILLISECONDS,
+                        ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
+                        RejectedExecutionHandler { _, _threadPoolExecutor ->
+                            Logger.t(TAG).w(
+                                "[${taskType.type}]:$_threadPoolExecutor  " +
+                                        "RejectedExecutionHandler"
+                            )
+                        }
+                    ))
             }
-            TaskType.TYPE_CPU->{
-
+            TaskType.TYPE_NETWORK -> {
+                return addThreadPool(taskType.type, Process.THREAD_PRIORITY_DEFAULT,
+                    ThreadPoolExecutor(
+                        NET_THREAD_POOL_SIZE,
+                        CPU_COUNT + NET_THREAD_POOL_SIZE,
+                        0L,
+                        TimeUnit.MILLISECONDS,
+                        ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
+                        RejectedExecutionHandler { _, _threadPoolExecutor ->
+                            Logger.t(TAG).w(
+                                "[${taskType.type}]:$_threadPoolExecutor  " +
+                                        "RejectedExecutionHandler"
+                            )
+                        }
+                    ))
             }
-            TaskType.TYPE_CPU->{
-
-            }else{
+            TaskType.TYPE_FILE -> {
+                return addThreadPool(taskType.type, Process.THREAD_PRIORITY_DEFAULT,
+                    ThreadPoolExecutor(
+                        FILE_THREAD_POOL_SIZE,
+                        CPU_COUNT + FILE_THREAD_POOL_SIZE,
+                        0L,
+                        TimeUnit.MILLISECONDS,
+                        ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
+                        RejectedExecutionHandler { _, _threadPoolExecutor ->
+                            Logger.t(TAG).w(
+                                "[${taskType.type}]:$_threadPoolExecutor  " +
+                                        "RejectedExecutionHandler"
+                            )
+                        }
+                    ))
+            }
+            else-> {
                 throw InvalidTaskTypeException("${taskType.type} has not been implement")
             }
         }
-        mNetworkIOExecutor = addThreadPool(TaskType.TYPE_DB.type, Process.THREAD_PRIORITY_DEFAULT,
-            ThreadPoolExecutor(
-                netCpuCoreSize,
-                CPU_COUNT + netCpuCoreSize,
-                0L,
-                TimeUnit.MILLISECONDS,
-                ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
-                RejectedExecutionHandler { _, _threadPoolExecutor ->
-                    Logger.t("XThreadPoolManager").w(
-                        "$_threadPoolExecutor  " +
-                                "RejectedExecutionHandler"
-                    )
-                }
-            ))
     }
 
     private fun addThreadPool(
         taskName: String,
         priority: Int = Process.THREAD_PRIORITY_DEFAULT,
         _threadPoolExecutor: ThreadPoolExecutor
-    ): ThreadPoolExecutor? {
-        val tempThreadPoolExecutor = threadPoolMap[taskName]
-        tempThreadPoolExecutor ?: kotlin.run {
-            threadPoolMap[taskName] = _threadPoolExecutor.apply {
+    ): ThreadPoolExecutor {
+        var tempThreadPoolExecutor = threadPoolMap[taskName]
+        if (tempThreadPoolExecutor == null) {
+            tempThreadPoolExecutor = _threadPoolExecutor.apply {
                 threadFactory = XThreadFactory(taskName, priority)
+                //允许核心线程闲置超时时被回收
                 allowCoreThreadTimeOut(true)
             }
             Logger.t(TAG).d("addThreadPool for $taskName")
+            threadPoolMap[taskName] = tempThreadPoolExecutor
         }
         return tempThreadPoolExecutor
     }
 
     private fun getThreadPool(tag: String):
             ThreadPoolExecutor {
-        threadPoolMap[tag]?.let { return it }?: kotlin.run {
+        threadPoolMap[tag]?.let { return it } ?: kotlin.run {
             Logger.t(TAG).i("$tag threadPool does not exist ,yet.Create it.")
 
-            if (threadPoolMap.size > 8){
-                throw MaxThreadPoolSizeException("Sorry,The ThreadPool attain max size.Advance to" +
-                        " running with specific task,such as addTask ")
+            if (threadPoolMap.size > 8) {
+                throw MaxThreadPoolSizeException(
+                    "Sorry,The ThreadPool attain max size.Advance to" +
+                            " running with specific task,such as addTask "
+                )
             }
 
-            when(tag){
-                TaskType.TYPE_CPU.type->{
+            when (tag) {
+                TaskType.TYPE_CPU.type -> {
 
                 }
-                TaskType.TYPE_CPU.type->{
+                TaskType.TYPE_CPU.type -> {
 
                 }
-                TaskType.TYPE_CPU.type->{
+                TaskType.TYPE_CPU.type -> {
 
                 }
-                TaskType.TYPE_CPU.type->{
+                TaskType.TYPE_CPU.type -> {
 
-                }else{
+                }
+                else  {
 
                 }
             }
         }
-        if(threadPoolMap.containsKey(tag)){
+        if (threadPoolMap.containsKey(tag)) {
             return threadPoolExecutor
         }
 
@@ -348,36 +351,36 @@ class XThreadTaskManager {
      *  @param tag 针对每个TAG 获取对应的线程池
      *  @param runnable 对应的 runnable 任务
      * */
-    private fun addTask(tag: TaskType, runnable: Runnable) {
+    private fun addInternalTask(tag: TaskType, runnable: Runnable) {
         getThreadPool(tag.type).execute(runnable)
     }
 
     /**
      * 添加数据库的任务
      */
-    fun addDbTask(runnable: Runnable){
-        addTask(TaskType.TYPE_DB,runnable)
+    fun addDbTask(runnable: Runnable) {
+        addInternalTask(TaskType.TYPE_DB, runnable)
     }
 
     /**
      * 添加文件的任务
      */
-    fun addFileTask(runnable: Runnable){
-        addTask(TaskType.TYPE_FILE,runnable)
+    fun addFileTask(runnable: Runnable) {
+        addInternalTask(TaskType.TYPE_FILE, runnable)
     }
 
     /**
      * 添加网络的任务
      */
-    fun addNetTask(runnable: Runnable){
-        addTask(TaskType.TYPE_NETWORK,runnable)
+    fun addNetTask(runnable: Runnable) {
+        addInternalTask(TaskType.TYPE_NETWORK, runnable)
     }
 
     /**
      * 添加CPU计算型的任务,例如加解密,编解码,排序等
      */
-    fun addTask(runnable: Runnable){
-        addTask(TaskType.TYPE_CPU,runnable)
+    fun addInternalTask(runnable: Runnable) {
+        addInternalTask(TaskType.TYPE_CPU, runnable)
     }
 
     /**
@@ -386,7 +389,7 @@ class XThreadTaskManager {
      *  @param runnable 对应的 runnable 任务
      * */
     fun addCustomTask(tag: String, runnable: Runnable) {
-        //getThreadPool(tag).execute(runnable)
+        getThreadPool(tag).execute(runnable)
     }
 
     /**
