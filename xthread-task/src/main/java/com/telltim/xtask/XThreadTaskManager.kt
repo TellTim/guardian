@@ -103,8 +103,8 @@ class XThreadTaskManager {
     companion object {
         val instance: XThreadTaskManager
             get() = SingletonHolder.holder
-        const val TAG = "XThreadTaskManager"
-        const val DUMP_TASK = "dumpTask"
+        private const val TAG = "XThreadTaskManager"
+        private const val DUMP_TASK = "dumpTask"
     }
 
     private object SingletonHolder {
@@ -135,6 +135,11 @@ class XThreadTaskManager {
      * CPU密集型的核心线程池大小
      */
     private val CPU_THREAD_POOL_SIZE = CPU_COUNT + 1
+
+    /**
+     * 假定用户自定义线程池的CPU的利用率是1,则CPU_CORE_SIZE = CPU_COUNT*(1 + 1/1)
+     */
+    private val CUSTOM_THREAD_POOL_SIZE = 2 * CPU_COUNT
 
     /**
      * 缓冲队列数
@@ -168,7 +173,7 @@ class XThreadTaskManager {
     /**
      * UI主线程
      */
-    private val mMainThread: Executor? by lazy { MainThreadExecutor() }
+    val mMainThread: Executor by lazy { MainThreadExecutor() }
 
     /**
      * 线程池map
@@ -295,54 +300,49 @@ class XThreadTaskManager {
             if (threadPoolMap.size > 8) {
                 throw MaxThreadPoolSizeException(
                     "Sorry,The ThreadPool attain max size.Advance to" +
-                            " running with specific task,such as addTask "
+                            " running with specific task,such as addDbTask,addFileTask,addNetTask,addCpuTask "
                 )
             }
 
             when (tag) {
-                TaskType.TYPE_CPU.type -> {
-
+                TaskType.TYPE_DB.type -> {
+                    Logger.t(TAG).w("threadPool does not contain $tag")
+                    mDbIOExecutor = generateThreadPoolExecutor(TaskType.TYPE_DB)
+                    return mDbIOExecutor as ThreadPoolExecutor
+                }
+                TaskType.TYPE_NETWORK.type -> {
+                    Logger.t(TAG).w("threadPool does not contain $tag")
+                    mNetworkIOExecutor = generateThreadPoolExecutor(TaskType.TYPE_NETWORK)
+                    return mNetworkIOExecutor as ThreadPoolExecutor
+                }
+                TaskType.TYPE_FILE.type -> {
+                    Logger.t(TAG).w("threadPool does not contain $tag")
+                    mFileThreadPoolExecutor = generateThreadPoolExecutor(TaskType.TYPE_FILE)
+                    return mFileThreadPoolExecutor as ThreadPoolExecutor
                 }
                 TaskType.TYPE_CPU.type -> {
-
+                    Logger.t(TAG).w("threadPool does not contain $tag")
+                    cpuThreadPoolExecutor = generateThreadPoolExecutor(TaskType.TYPE_CPU)
+                    return cpuThreadPoolExecutor as ThreadPoolExecutor
                 }
-                TaskType.TYPE_CPU.type -> {
-
-                }
-                TaskType.TYPE_CPU.type -> {
-
-                }
-                else  {
-
+                else->  {
+                    return addThreadPool(tag, Process.THREAD_PRIORITY_DEFAULT,
+                        ThreadPoolExecutor(
+                            CUSTOM_THREAD_POOL_SIZE,
+                            CPU_COUNT + CUSTOM_THREAD_POOL_SIZE,
+                            0L,
+                            TimeUnit.MILLISECONDS,
+                            ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
+                            RejectedExecutionHandler { _, _threadPoolExecutor ->
+                                Logger.t(TAG).w(
+                                    "[$tag]:$_threadPoolExecutor  " +
+                                            "RejectedExecutionHandler"
+                                )
+                            }
+                        ))
                 }
             }
         }
-        if (threadPoolMap.containsKey(tag)) {
-            return threadPoolExecutor
-        }
-
-        /*if (threadPoolExecutor == null) {
-
-
-
-            threadPoolExecutor = ThreadPoolExecutor(
-                CORE_POOL_SIZE,
-                MAXIMUM_POOL_SIZE,
-                KEEP_ALIVE_TIME,
-                TimeUnit.SECONDS,
-                ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
-                RejectedExecutionHandler { _, _threadPoolExecutor ->
-                    Logger.t("XThreadPoolManager").w(
-                        "$_threadPoolExecutor  " +
-                                "RejectedExecutionHandler"
-                    )
-                }
-            )
-            //允许核心线程闲置超时时被回收
-            threadPoolExecutor.allowCoreThreadTimeOut(true)
-            threadPoolMap[tag] = threadPoolExecutor
-        }
-        return threadPoolExecutor*/
     }
 
 
@@ -379,7 +379,7 @@ class XThreadTaskManager {
     /**
      * 添加CPU计算型的任务,例如加解密,编解码,排序等
      */
-    fun addInternalTask(runnable: Runnable) {
+    fun addCpuTask(runnable: Runnable) {
         addInternalTask(TaskType.TYPE_CPU, runnable)
     }
 
@@ -387,32 +387,37 @@ class XThreadTaskManager {
      *  获取自定义线程池,需要手动关闭
      *  @param tag 针对每个TAG 获取对应的线程池
      *  @param runnable 对应的 runnable 任务
+     *  增加"_"的前缀,区分内部自定义的线程池,同时避免外部使用了同名的tag
      * */
     fun addCustomTask(tag: String, runnable: Runnable) {
-        getThreadPool(tag).execute(runnable)
+        val customTag = "_$tag"
+        getThreadPool(customTag).execute(runnable)
     }
 
     /**
      * 关闭自定义线程池
+     * 增加"_"的前缀,区分内部自定义的线程池,同时避免外部使用了同名的tag
      */
     fun removeCustomTask(tag: String, runnable: Runnable) {
-        // todo
+        val customTag = "_$tag"
     }
 
     /**
      *  获取自定义定时线程池,需要手动关闭
      *  @param tag 针对每个TAG 获取对应的线程池
      *  @param runnable 对应的 runnable 任务
+     *  增加"_"的前缀,区分内部自定义的线程池,同时避免外部使用了同名的tag
      * */
     fun addCustomScheduleTask(tag: String, runnable: Runnable) {
-        //getThreadPool(tag).execute(runnable)
+        val customTag = "_$tag"
     }
 
     /**
      * 关闭自定义线程池
+     * 增加"_"的前缀,区分内部自定义的线程池,同时避免外部使用了同名的tag
      */
     fun removeCustomScheduleTask(tag: String, runnable: Runnable) {
-        // todo
+        val customTag = "_$tag"
     }
 
 

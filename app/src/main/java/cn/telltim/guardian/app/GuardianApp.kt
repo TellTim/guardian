@@ -14,6 +14,7 @@ import com.telltim.startup.AppBootUp
 import com.telltim.startup.AppBootUpTaskListener
 import com.telltim.startup.Config
 import com.telltim.startup.OnProjectListener
+import com.telltim.xtask.XThreadTaskManager
 import xcrash.ICrashCallback
 import xcrash.TombstoneManager
 import xcrash.XCrash
@@ -39,12 +40,7 @@ class GuardianApp : MultiDexApplication() {
     private fun bootApp() {
         initLogger()
         initCrash()
-        initThreadPool()
         initAppTask()
-    }
-
-    private fun initThreadPool() {
-        ThreadManager.instance.initThreadPool()
     }
 
     private fun initCrash() {
