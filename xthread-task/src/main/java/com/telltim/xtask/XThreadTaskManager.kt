@@ -398,8 +398,30 @@ class XThreadTaskManager {
      * 关闭自定义线程池
      * 增加"_"的前缀,区分内部自定义的线程池,同时避免外部使用了同名的tag
      */
-    fun removeCustomTask(tag: String, runnable: Runnable) {
+    fun removeCustomTask(tag: String) {
         val customTag = "_$tag"
+        val tempThreadPoolExecutor = threadPoolMap[customTag]
+        tempThreadPoolExecutor?.let {
+            try {
+                // shutdown只是起到通知的作用
+                // 只调用shutdown方法结束线程池是不够的
+                tempThreadPoolExecutor.shutdown()
+                // (所有的任务都结束的时候，返回TRUE)
+                if (!tempThreadPoolExecutor.awaitTermination(1000, TimeUnit.MILLISECONDS)) {
+                    // 超时的时候向线程池中所有的线程发出中断(interrupted)。
+                    tempThreadPoolExecutor.shutdownNow()
+                }
+            } catch (e: InterruptedException) {
+                // awaitTermination方法被中断的时候也中止线程池中全部的线程的执行。
+                tempThreadPoolExecutor.shutdownNow()
+                Logger.t(TAG).e("$tag threadPool shutdown exception ${e.message}")
+            }finally {
+                threadPoolMap.remove(customTag)
+                Logger.t(TAG).d("$tag threadPool remove success")
+            }
+        }?: kotlin.run {
+            Logger.t(TAG).i("$tag threadPool has bean destroy")
+        }
     }
 
     /**
