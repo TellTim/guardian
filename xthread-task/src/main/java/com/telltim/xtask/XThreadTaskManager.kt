@@ -167,7 +167,7 @@ class XThreadTaskManager {
     /**
      * CPU密集型的线程池
      */
-    private var cpuThreadPoolExecutor: ThreadPoolExecutor?
+    var cpuThreadPoolExecutor: ThreadPoolExecutor?
         get() = null
 
     /**

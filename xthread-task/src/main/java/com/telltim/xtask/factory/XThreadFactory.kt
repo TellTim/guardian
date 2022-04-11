@@ -17,7 +17,8 @@ import java.util.concurrent.atomic.AtomicInteger
  * @Author     : Tim.WJ
  * @Description: 可设置前缀和优先级的线程工厂
  */
-class XThreadFactory(private val threadName: String,private val priority:Int = Process.THREAD_PRIORITY_DEFAULT) :ThreadFactory {
+internal class XThreadFactory(private val threadName: String,private val priority:Int = Process
+    .THREAD_PRIORITY_DEFAULT) :ThreadFactory {
 
     private val mThreadId = AtomicInteger(0)
 

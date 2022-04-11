@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">voice-app</string>
+    <string name="title_activity_voice_core">VoiceCoreActivity</string>
+</resources>

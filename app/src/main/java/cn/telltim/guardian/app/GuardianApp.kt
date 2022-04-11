@@ -1,7 +1,6 @@
 package cn.telltim.guardian.app
 
 import android.util.Log
-import androidx.multidex.BuildConfig
 import androidx.multidex.MultiDexApplication
 import cn.telltim.common.ProcessUtil
 import cn.telltim.guardian.BuildConfig
@@ -15,6 +14,7 @@ import com.telltim.startup.AppBootUpTaskListener
 import com.telltim.startup.Config
 import com.telltim.startup.OnProjectListener
 import com.telltim.xtask.XThreadTaskManager
+
 import xcrash.ICrashCallback
 import xcrash.TombstoneManager
 import xcrash.XCrash
@@ -117,8 +117,7 @@ class GuardianApp : MultiDexApplication() {
             .setConfig(Config(AppConst.isStrictMode))
             .addTaskListener(AppBootUpTaskListener(AppConst.TAG, true))
             .setExecutorService(
-                ThreadManager.instance.getExecutor()?.executor as
-                        ThreadPoolExecutor?
+                XThreadTaskManager.instance.cpuThreadPoolExecutor
             )
             .addOnProjectExecuteListener(object : OnProjectListener {
                 override fun onProjectStart() {

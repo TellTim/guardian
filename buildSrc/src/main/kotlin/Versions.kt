@@ -4,7 +4,7 @@ object Versions {
     const val library = "7.1.2"
     const val kotlin = "1.6.10"
     const val composeVersion = "1.1.1"
-    const val activityComposeVersion = "1.3.1"
+    const val activityComposeVersion = "1.4.0"
     const val timber = "4.7.1"
     const val appCompat = "1.4.1"
     const val annotation ="1.3.0"

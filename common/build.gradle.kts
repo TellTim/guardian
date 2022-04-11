@@ -41,4 +41,5 @@ dependencies {
     androidTestImplementation(Deps.TestDeps.extJunit)
     androidTestImplementation(Deps.TestDeps.espresso)
     implementation(project(mapOf("path" to ":logger")))
+    implementation(project(mapOf("path" to ":xthread-task")))
 }

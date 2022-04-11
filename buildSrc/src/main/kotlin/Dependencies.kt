@@ -37,7 +37,7 @@ object Deps {
 
     object LifecycleDeps {
         val lifecycleRuntimeKtx by lazy{
-            "androidx.lifecycle:lifecycle-runtime-ktx:2.3.1"
+            "androidx.lifecycle:lifecycle-runtime-ktx:2.4.1"
         }
     }
 
