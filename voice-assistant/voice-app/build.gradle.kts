@@ -54,7 +54,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = rootProject.extra["compose_version"] as String
+        kotlinCompilerExtensionVersion = Versions.composeVersion
     }
     packagingOptions {
         resources {
@@ -91,7 +91,7 @@ dependencies {
     implementation(Deps.ComposeDeps.composeUIPreview)
     implementation(Deps.LifecycleDeps.lifecycleRuntimeKtx)
     implementation(Deps.ComposeDeps.activityCompose)
-    implementation(project(mapOf("path" to ":voice-assistant:voice-app:aidl-binder")))
+    implementation(project(mapOf("path" to ":voice-assistant:voice-app:assistant-binder")))
     testImplementation(Deps.TestDeps.junit)
     androidTestImplementation(Deps.TestDeps.extJunit)
     androidTestImplementation(Deps.TestDeps.espresso)

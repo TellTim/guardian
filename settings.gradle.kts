@@ -25,6 +25,9 @@ include(":app",":ble",":auth",
     ":voice-assistant:voice-sdk",
     ":voice-assistant:voice-app",
     ":voice-assistant:voice-app:iflyos-sdk",
-    ":voice-assistant:voice-app:aidl-binder",
-    ":voice-assistant:voice-client"
+    ":voice-assistant:voice-app:assistant-binder",
+    ":voice-assistant:voice-client",
+    ":push-center:push-server",
+    ":push-center:push-server:daemon-binder",
+    ":push-center:daemon-server",
 )

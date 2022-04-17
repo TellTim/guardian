@@ -1,3 +1,12 @@
 <resources>
-    <string name="app_name">voice-client</string>
+    <string name="title_activity_voice_client">VoiceClientActivity</string>
+    <string name="app_name">助手客户端内测版</string>
+    <string name="str_sdk_init">SDK初始化</string>
+    <string name="str_voice_assistant_recorder_enable">您可以进行交互了</string>
+    <string name="str_voice_assistant_recorder_disable">设备禁止交互</string>
+    <string name="str_voice_assistant_register">已注册私有业务的监听</string>
+    <string name="str_sdk_release_success">SDK已销毁</string>
+    <string name="str_sdk_release_failure">SDK销毁失败</string>
+    <string name="str_matching_simple">命中无参技能 [%s]</string>
+    <string name="str_matching">命中带参 [%s],参数为 [%s]</string>
 </resources>

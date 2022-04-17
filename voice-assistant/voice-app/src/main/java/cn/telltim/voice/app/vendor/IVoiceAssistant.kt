@@ -11,7 +11,7 @@
 package cn.telltim.voice.app.vendor
 
 import android.os.Bundle
-import cn.telltim.voice.app.aidlbinder.IBaseResponse
+import cn.telltim.voice.app.binder.IBaseResponse
 
 /**
  * @Author     : Tim.WJ

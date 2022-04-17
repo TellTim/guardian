@@ -16,4 +16,5 @@ object Versions {
     const val multidex = "2.0.1"
 
     const val leakCanary = "2.8.1"
+    const val fastjson = "1.4.21"
 }

@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId = "cn.telltim.voice.client"
         minSdk = AppConfigs.minSdkVersion
-        targetSdk= AppConfigs.targetSdkVersion
+        targetSdk = AppConfigs.targetSdkVersion
         versionCode = AppConfigs.versionCode
         versionName = AppConfigs.versionName
         vectorDrawables {
@@ -35,24 +35,47 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures {
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = Versions.composeVersion
+    }
+    packagingOptions {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
+    setFlavorDimensions(listOf("client"))
+    productFlavors {
+        create("demo") {
+            isDefault = true
+            dimension = "client"
+            buildConfigField(
+                "String", "CLIENT_NAME", "demo"
+            )
+            buildConfigField(
+                "String", "CUSTOM_PREFIX", "test"
+            )
+
+        }
+    }
 }
 
 dependencies {
-
     implementation(fileTree(mapOf("include" to listOf("*.jar"), "dir" to "libs")))
+    implementation(KtDeps.kotlin)
     implementation(KtDeps.ktx)
     implementation(Deps.multidex)
-    implementation(Deps.ComposeDeps.composeUI)
-    implementation(Deps.ComposeDeps.composeMaterial)
-    implementation(Deps.ComposeDeps.composeUIPreview)
-    implementation(Deps.LifecycleDeps.lifecycleRuntimeKtx)
-    implementation(Deps.ComposeDeps.activityCompose)
+    implementation(Deps.appCompat)
+    implementation(Deps.constraintLayout)
+    implementation(ThirdDeps.fastjson)
     testImplementation(Deps.TestDeps.junit)
     androidTestImplementation(Deps.TestDeps.extJunit)
     androidTestImplementation(Deps.TestDeps.espresso)
-    androidTestImplementation(Deps.ComposeDeps.composeUiTest)
-    debugImplementation(Deps.ComposeDeps.composeUiTooling)
     debugImplementation(ThirdDeps.leakCanary)
+    implementation(project(mapOf("path" to ":voice-assistant:voice-app:assistant-binder")))
     implementation(project(mapOf("path" to ":voice-assistant:voice-sdk")))
     implementation(project(mapOf("path" to ":logger")))
 }

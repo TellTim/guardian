@@ -5,7 +5,7 @@ object Deps {
     val appCompat by lazy { "androidx.appcompat:appcompat:${Versions.appCompat}" }
     val materialDesign by lazy { "com.google.android.material:material:${Versions.material}" }
     val constraintLayout by lazy { "androidx.constraintlayout:constraintlayout:${Versions.constraintLayout}" }
-    val multidex by lazy { "androidx.multidex:multidex:${Versions.multidex}"}
+    val multidex by lazy { "androidx.multidex:multidex:${Versions.multidex}" }
     val annotation by lazy { "androidx.annotation:annotation:${Versions.annotation}" }
 
 
@@ -21,7 +21,7 @@ object Deps {
         val composeMaterial by lazy {
             "androidx.compose.material:material:${Versions.composeVersion}"
         }
-        val composeUIPreview by lazy { "androidx.compose.ui:ui-tooling-preview:${Versions.composeVersion}"  }
+        val composeUIPreview by lazy { "androidx.compose.ui:ui-tooling-preview:${Versions.composeVersion}" }
         val activityCompose by lazy {
             "androidx.activity:activity-compose:${Versions.activityComposeVersion}"
         }
@@ -36,7 +36,7 @@ object Deps {
     }
 
     object LifecycleDeps {
-        val lifecycleRuntimeKtx by lazy{
+        val lifecycleRuntimeKtx by lazy {
             "androidx.lifecycle:lifecycle-runtime-ktx:2.4.1"
         }
     }
@@ -45,9 +45,19 @@ object Deps {
 
 object KtDeps {
     val kotlin by lazy { "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}" }
-    val ktx by lazy {"androidx.core:core-ktx:${Versions.coreKtx}"}
+    val ktx by lazy { "androidx.core:core-ktx:${Versions.coreKtx}" }
 }
 
-object ThirdDeps{
+object ThirdDeps {
     val leakCanary by lazy { "com.squareup.leakcanary:leakcanary-android:${Versions.leakCanary}" }
+    val fastjson by lazy{
+        "com.alibaba:fastjson:${Versions.fastjson}"
+    }
+    object JPushDeps {
+        val jpush by lazy { "cn.jiguang.sdk:jpush:4.6.4" }
+        val jcore by lazy {
+            "cn.jiguang.sdk:jcore:3.2.2"
+        }
+    }
+
 }

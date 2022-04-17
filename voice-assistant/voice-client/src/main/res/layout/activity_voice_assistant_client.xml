@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".VoiceAssistantClientActivity">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/initCall"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:textSize="20sp"
+        android:text="-"
+        tools:ignore="MissingConstraints" />
+
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:visibility="gone"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="32dp"
+        app:layout_constraintBottom_toBottomOf="@+id/initCall"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/initCall" />
+
+    <!--    按钮集合-->
+    <LinearLayout
+        android:id="@+id/btns"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!--    初始化按钮-->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/initBtn"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:text="初始化助手" />
+
+        <!--    销毁助手-->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/killBtn"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="20dp"
+            android:text="销毁助手" />
+
+        <!--    开启唤醒-->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/wakeUpOnBtn"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="20dp"
+            android:text="开启唤醒" />
+
+        <!--    关闭唤醒-->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/wakeUpOffBtn"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="20dp"
+            android:text="关闭唤醒" />
+
+
+        <!-- 打开WIFI设置-->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/wifiBtn"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="20dp"
+            android:text="打开WIFI设置" />
+
+    </LinearLayout>
+
+    <!--文字编辑-->
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/editView"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        android:singleLine="true"
+        android:maxLines="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btns" />
+
+    <LinearLayout
+        android:id="@+id/btns1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@+id/editView">
+
+        <!--    播报-->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/sayBtn"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="20dp"
+            android:text="TTS开始播报" />
+
+        <!--        停止播报-->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/stopSayBtn"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="20dp"
+            android:text="TTS停止播报" />
+
+        <!-- 暂停播报-->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/pauseBtn"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="20dp"
+            android:text="TTS暂停播报" />
+
+        <!-- 恢复播报-->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/resumeBtn"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="20dp"
+            android:text="TTS恢复播报" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/exitBtn"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="20dp"
+            android:text="杀掉本进程" />
+
+
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/communicateTxt1"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:textSize="20sp"
+        android:text="-"
+        android:gravity="center"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="30dp"
+        app:layout_constraintEnd_toStartOf="@id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btns1" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/communicateTxt2"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:textSize="20sp"
+        android:text="-"
+        android:gravity="center"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="30dp"
+        app:layout_constraintStart_toStartOf="@id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btns1" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/interceptorTxt"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:textSize="20sp"
+        android:text="-"
+        android:gravity="center"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="30dp"
+        app:layout_constraintEnd_toStartOf="@id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/communicateTxt1" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/recognitionTxt"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:textSize="20sp"
+        android:text="-"
+        android:gravity="center"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="30dp"
+        app:layout_constraintStart_toStartOf="@id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/communicateTxt1" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

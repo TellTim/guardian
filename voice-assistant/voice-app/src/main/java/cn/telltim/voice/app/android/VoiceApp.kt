@@ -9,9 +9,16 @@
 //
 package cn.telltim.voice.app.android
 
+import androidx.multidex.MultiDexApplication
+
 /**
  * @Author     : Tim.WJ
  * @Description:
  */
-class VoiceApp {
+class VoiceApp :MultiDexApplication(){
+
+    override fun onCreate() {
+        super.onCreate()
+
+    }
 }

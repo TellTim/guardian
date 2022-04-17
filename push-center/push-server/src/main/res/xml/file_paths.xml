@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-cache-path name="external-cache-path" path="."/>
+</paths>
+    <!--path：需要临时授权访问的路径（.代表所有路径）-->
+    <!--name：就是你给这个访问路径起个名字-->
+
+
+    <!--&lt;!&ndash;FileProvider提供的共享目录配置文件&ndash;&gt;-->
+<!--<paths>-->
+<!--&lt;!&ndash;内置SD卡 Environment.getExternalStorageDirectory() .表示共享所有的目录，也可以指定共享的目录&ndash;&gt;-->
+<!--<external-path-->
+    <!--name="external-path"-->
+    <!--path="."/>-->
+<!--&lt;!&ndash;内置SD卡 Context.getExternalCacheDir() .表示共享所有的目录，也可以指定共享的目录&ndash;&gt;-->
+<!--<external-cache-path-->
+    <!--name="external-cache-path"-->
+    <!--path="."/>-->
+<!--&lt;!&ndash;内置SD卡 Context.getExternalFilesDir(null) .表示共享所有的目录，也可以指定共享的目录&ndash;&gt;-->
+<!--<external-files-path-->
+    <!--name="external-files-path"-->
+    <!--path="."/>-->
+<!--&lt;!&ndash;data目录下 Context.getFilesDir() .表示共享所有的目录，也可以指定共享的目录&ndash;&gt;-->
+<!--<files-path-->
+    <!--name="files_path"-->
+    <!--path="."/>-->
+<!--&lt;!&ndash;data缓存目录 Context.getCacheDir() .表示共享所有的目录，也可以指定共享的目录&ndash;&gt;-->
+<!--<cache-path-->
+    <!--name="cache-path"-->
+    <!--path="."/>-->
+<!--&lt;!&ndash;这个标签Android官方文档中是没有提及，Android设备的根目录，该目录下包含着手机内部存储器，外置SD卡等所有文件的目录&ndash;&gt;-->
+<!--<root-path-->
+    <!--name="name"-->
+    <!--path="."/>-->
+<!--</paths>-->
